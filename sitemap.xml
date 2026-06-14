@@ -7,13 +7,13 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://wired-vibee.vercel.app/profile.html</loc>
+    <loc>https://wired-vibee.vercel.app/profile</loc>
     <lastmod>2026-06-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://wired-vibee.vercel.app/chat.html</loc>
+    <loc>https://wired-vibee.vercel.app/chat</loc>
     <lastmod>2026-06-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

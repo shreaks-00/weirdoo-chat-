@@ -178,7 +178,7 @@
 <body>
 
     <!-- Back Button -->
-    <a href="index.html" class="back-link">
+    <a href="/" class="back-link">
         <i class="ph-fill ph-arrow-left text-2xl"></i>
         <span>Back to Landing</span>
     </a>
@@ -407,7 +407,7 @@
             showToast(`Welcome back, ${savedUser.name}! Entering chat...`, 'bg-[var(--neon-green)]');
             
             setTimeout(() => {
-                window.location.href = 'chat.html';
+                window.location.href = '/chat';
             }, 1000);
         }
 
@@ -454,7 +454,7 @@
             showToast("Profile saved! Entering chat...", "bg-[var(--neon-green)]");
 
             setTimeout(() => {
-                window.location.href = 'chat.html';
+                window.location.href = '/chat';
             }, 1500);
         });
 

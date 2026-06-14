@@ -175,7 +175,7 @@
         </header>
 
         <!-- User Profile Badge -->
-        <a href="profile.html" class="user-badge hover:bg-gray-100 transition-colors" title="Edit Profile">
+        <a href="/profile" class="user-badge hover:bg-gray-100 transition-colors" title="Edit Profile">
             <span id="user-avatar" class="text-2xl">😊</span>
             <span id="user-name" class="hidden sm:inline">Guest</span>
         </a>
@@ -562,7 +562,7 @@
                 localStream.getTracks().forEach(track => track.stop());
                 localStream = null;
             }
-            window.location.href = 'index.html';
+            window.location.href = '/';
         }
 
         toggleVideoBtn.addEventListener('click', () => {
