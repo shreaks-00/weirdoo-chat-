@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiredVibe - Live Chat</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Bungee for funky headers, Space Mono for text -->
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons for UI buttons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-cyan: #00ffff;
+            --neon-yellow: #fffb00;
+            --neon-green: #39ff14;
+            --bg-purple: #3a0ca3;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: var(--bg-purple);
+            background-image: radial-gradient(var(--neon-cyan) 2px, transparent 2px), radial-gradient(var(--neon-pink) 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            animation: moveBackground 10s linear infinite;
+            color: #000;
+            overflow-x: hidden;
+        }
+
+        @keyframes moveBackground {
+            0% { background-position: 0 0, 20px 20px; }
+            100% { background-position: 40px 40px, 60px 60px; }
+        }
+
+        h1, h2, h3, .funky-font {
+            font-family: 'Bungee', cursive;
+        }
+
+        /* Neo-brutalism styling */
+        .neo-box {
+            background-color: white;
+            border: 4px solid black;
+            box-shadow: 8px 8px 0px black;
+            border-radius: 16px;
+        }
+
+        .neo-btn {
+            border: 4px solid black;
+            box-shadow: 6px 6px 0px black;
+            border-radius: 12px;
+            transition: all 0.1s ease-in-out;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .neo-btn:active {
+            box-shadow: 0px 0px 0px black;
+            transform: translate(6px, 6px);
+        }
+
+        /* CRT Scanline effect for video */
+        .crt-container {
+            position: relative;
+            overflow: hidden;
+            background: #111;
+        }
+
+        .crt-container::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Status Dot */
+        .status-dot {
+            height: 15px;
+            width: 15px;
+            background-color: #ff3333;
+            border-radius: 50%;
+            display: inline-block;
+            border: 2px solid black;
+        }
+        .status-dot.online {
+            background-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        .animate-spin-slow {
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .user-badge {
+            background: white;
+            border: 4px solid black;
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 4px 4px 0px black;
+        }
+
+        /* Custom Modal */
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .neo-input {
+            border: 4px solid black;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-family: 'Space Mono', monospace;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .neo-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px var(--neon-cyan);
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-8 px-4">
+
+    <!-- Top Bar -->
+    <div class="w-full max-w-5xl flex justify-between items-center mb-8 z-10">
+        <!-- Logo Header -->
+        <header class="text-center relative cursor-pointer group" onclick="goHome()">
+            <h2 class="text-4xl md:text-5xl text-white drop-shadow-[4px_4px_0_rgba(0,0,0,1)] tracking-wide relative inline-block group-hover:scale-105 transition-transform">
+                <span class="text-[var(--neon-pink)]">Wired</span><span class="text-[var(--neon-cyan)]">Vibe</span>
+            </h2>
+            <div class="text-sm font-bold text-white mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Exit Chat</div>
+        </header>
+
+        <!-- User Profile Badge -->
+        <a href="profile.html" class="user-badge hover:bg-gray-100 transition-colors" title="Edit Profile">
+            <span id="user-avatar" class="text-2xl">😊</span>
+            <span id="user-name" class="hidden sm:inline">Guest</span>
+        </a>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div class="flex flex-col gap-4 relative z-10 w-full max-w-5xl mx-auto">
+        
+        <!-- Video Area (Top) -->
+        <div class="flex flex-col gap-6 relative w-full">
+            
+            <!-- Remote Video (Big) -->
+            <div class="neo-box p-4 bg-white relative">
+                <div class="absolute top-0 left-6 bg-[var(--neon-pink)] text-white px-4 py-1 border-x-4 border-b-4 border-black font-bold z-30 text-xl funky-font rounded-b-lg">
+                    Stranger
+                </div>
+                
+                <div class="crt-container neo-box h-[50vh] md:h-[60vh] min-h-[300px] max-h-[500px] w-full flex items-center justify-center border-none mt-2 relative bg-black">
+                    
+                    <!-- The Video Element (No controls, autoplaying to simulate live call) -->
+                    <video id="remote-video" playsinline class="w-full h-full object-cover hidden"></video>
+                    
+                    <!-- Fake Loading Overlay -->
+                    <div id="waiting-overlay" class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white z-20">
+                        <i class="ph-fill ph-globe-hemisphere-west text-6xl mb-4 text-[var(--neon-cyan)] animate-spin-slow"></i>
+                        <div id="waiting-text" class="font-bold text-2xl animate-pulse funky-font text-center px-4">
+                            Connecting...
+                        </div>
+                        <div id="connecting-location" class="mt-4 text-[var(--neon-yellow)] font-mono text-sm h-6 font-bold tracking-widest uppercase"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Local Video (Small, floating over the main video) -->
+            <div class="neo-box p-2 bg-white w-32 sm:w-64 absolute bottom-6 right-6 transform rotate-2 hover:rotate-0 transition-transform duration-300 z-40 shadow-[8px_8px_0_#000]">
+                <div class="absolute -top-3 -left-3 bg-[var(--neon-cyan)] text-black px-2 py-1 border-4 border-black font-bold z-50 text-xs sm:text-sm funky-font rounded-lg transform -rotate-6 shadow-[2px_2px_0_#000]">
+                    YOU
+                </div>
+                <div class="crt-container h-[120px] sm:h-[160px] w-full border-4 border-black rounded-lg bg-black">
+                    <video id="local-video" autoplay playsinline muted class="w-full h-full object-cover transform scale-x-[-1]"></video>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Compact Connection Panel (Bottom Row) -->
+        <div class="neo-box p-3 md:p-4 bg-[var(--neon-yellow)] flex flex-col md:flex-row items-center justify-between gap-4 w-full">
+            
+            <!-- Status -->
+            <div class="flex items-center gap-2 font-bold bg-white px-4 py-2 border-2 border-black rounded-full text-sm md:text-base w-full md:w-auto justify-center md:justify-start">
+                <span id="connection-status-dot" class="status-dot"></span>
+                <span id="connection-status-text" class="whitespace-nowrap">Idle</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 sm:flex gap-3 w-full md:w-auto flex-1 md:justify-center">
+                <button id="start-btn" class="neo-btn flex-1 md:flex-none md:w-32 bg-[var(--neon-green)] text-black px-4 py-2 text-base md:text-lg hover:bg-green-400 flex items-center justify-center gap-2 hidden">
+                    <i class="ph-fill ph-play"></i> Start
+                </button>
+                <button id="next-btn" class="neo-btn flex-1 md:flex-none md:w-32 bg-[var(--neon-cyan)] text-black px-4 py-2 text-base md:text-lg hover:bg-cyan-400 flex items-center justify-center gap-2">
+                    <i class="ph-fill ph-fast-forward"></i> Skip
+                </button>
+                <button id="stop-btn" class="neo-btn flex-1 md:flex-none md:w-32 bg-white text-black px-4 py-2 text-base md:text-lg hover:bg-gray-200 flex items-center justify-center gap-2">
+                    <i class="ph-fill ph-stop"></i> Stop
+                </button>
+                <button id="report-btn" class="neo-btn flex-1 md:flex-none md:w-32 bg-[var(--neon-pink)] text-white px-4 py-2 text-base md:text-lg hover:bg-pink-600 flex items-center justify-center gap-2" title="Report Stranger">
+                    <i class="ph-fill ph-warning-circle"></i> Report
+                </button>
+            </div>
+
+            <!-- Hardware Controls -->
+            <div class="flex gap-3 w-full md:w-auto md:border-l-4 border-black md:pl-4 justify-center">
+                <button id="toggle-video-btn" class="neo-btn flex-1 md:flex-none bg-white px-4 py-2 hover:bg-gray-200" title="Toggle Camera">
+                    <i class="ph-fill ph-video-camera text-xl md:text-2xl" id="video-icon"></i>
+                </button>
+                <button id="toggle-audio-btn" class="neo-btn flex-1 md:flex-none bg-white px-4 py-2 hover:bg-gray-200" title="Toggle Microphone">
+                    <i class="ph-fill ph-microphone text-xl md:text-2xl" id="audio-icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast" class="neo-box bg-[var(--neon-cyan)] px-6 py-3 font-bold text-lg flex items-center gap-2">
+        <i class="ph-fill ph-info text-2xl"></i>
+        <span id="toast-msg">Notification</span>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="modal-overlay">
+        <div class="neo-box p-8 max-w-sm w-[90%] bg-[var(--neon-yellow)] flex flex-col items-center text-center transform rotate-1">
+            <h2 class="text-3xl funky-font mb-4 text-[var(--neon-pink)]">Report User</h2>
+            <p class="text-lg font-bold mb-4">Why are you reporting this stranger?</p>
+            
+            <div class="flex flex-col gap-3 w-full text-left">
+                <label class="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-lg cursor-pointer hover:bg-gray-100 font-bold">
+                    <input type="radio" name="report-reason" value="Inappropriate Behavior" class="w-5 h-5 accent-[var(--neon-pink)]" checked>
+                    Inappropriate Behavior
+                </label>
+                <label class="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-lg cursor-pointer hover:bg-gray-100 font-bold">
+                    <input type="radio" name="report-reason" value="Nudity or Sexual Content" class="w-5 h-5 accent-[var(--neon-pink)]">
+                    Nudity / Sexual Content
+                </label>
+                <label class="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-lg cursor-pointer hover:bg-gray-100 font-bold">
+                    <input type="radio" name="report-reason" value="Harassment" class="w-5 h-5 accent-[var(--neon-pink)]">
+                    Harassment or Hate Speech
+                </label>
+                <label class="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-lg cursor-pointer hover:bg-gray-100 font-bold">
+                    <input type="radio" name="report-reason" value="Custom" class="w-5 h-5 accent-[var(--neon-pink)]" id="custom-reason-radio">
+                    Other (Custom)
+                </label>
+                <input type="text" id="custom-reason-input" class="neo-input mt-2 hidden" placeholder="Type your reason here...">
+            </div>
+
+            <div class="flex gap-4 w-full mt-6">
+                <button id="cancel-report-btn" class="neo-btn flex-1 py-3 bg-white text-black hover:bg-gray-200">Cancel</button>
+                <button id="submit-report-btn" class="neo-btn flex-1 py-3 bg-[var(--neon-pink)] text-white hover:bg-pink-600">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const savedUser = JSON.parse(localStorage.getItem('wiredvibe_user'));
+        if (!savedUser) {
+            window.location.href = 'profile.html';
+        } else {
+            document.getElementById('user-name').innerText = savedUser.name || 'Guest';
+            document.getElementById('user-avatar').innerText = savedUser.avatar || '😊';
+        }
+
+        // DOM Elements
+        const localVideo = document.getElementById('local-video');
+        const remoteVideo = document.getElementById('remote-video');
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const reportBtn = document.getElementById('report-btn');
+        
+        const waitingOverlay = document.getElementById('waiting-overlay');
+        const waitingText = document.getElementById('waiting-text');
+        const connectingLocation = document.getElementById('connecting-location');
+        
+        const statusDot = document.getElementById('connection-status-dot');
+        const statusText = document.getElementById('connection-status-text');
+        const toggleVideoBtn = document.getElementById('toggle-video-btn');
+        const toggleAudioBtn = document.getElementById('toggle-audio-btn');
+        const videoIcon = document.getElementById('video-icon');
+        const audioIcon = document.getElementById('audio-icon');
+
+        // Hugging Face Video Dataset (Raw resolving URLs)
+        const FAKE_VIDEOS = [
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_beautiful-girl-in-front-of-webcam_Media_BMELOi28Lic_001_480p.mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_eLis5PC2ogg_002_720p.mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback%20(10).mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Han_Media_opeP4KUEzSY_002_720p.mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_school-makeup-no-talking_Media_VzKKPnac6FI_002_720p.mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback%20(11).mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback%20(12).mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/videoplayback%20(14).mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Old_Media_nr4EG7iucNY_002_720p.mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_Y88wGtEMmLM_002_720p.mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_2Pbh9uX_iD8_002_720p.mp4",
+            "https://huggingface.co/datasets/Antrikshhsjidv/mira-mi-vidoes/resolve/main/YTDown.com_YouTube_Fake-WebCam-HD-For-Video-Omegle-Face-Cut_Media_LchAQMK-GqE_002_720p.mp4"
+        ];
+
+        const COUNTRIES = ["USA", "Brazil", "Japan", "Germany", "France", "South Korea", "UK", "Canada", "Australia", "Mexico", "Spain", "Italy", "India", "Sweden"];
+
+        // State Variables
+        let localStream = null;
+        let isVideoMuted = false;
+        let isAudioMuted = false;
+        let isSearching = false;
+        let searchTimeout = null;
+
+        // Initialize camera automatically when page loads
+        async function initCamera() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                localVideo.srcObject = localStream;
+                findStranger(); // Start searching instantly after camera is ready
+            } catch (err) {
+                console.log('Camera access denied. Using Funky Fake-Cam fallback instead.');
+                showToast("Camera blocked! Using Funky Fake-Cam.", "bg-yellow-400");
+                localStream = createFakeStream();
+                if (localStream) {
+                    localVideo.srcObject = localStream;
+                }
+                findStranger();
+            }
+        }
+
+        function createFakeStream() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 320;
+            canvas.height = 240;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw funky static
+            setInterval(() => {
+                ctx.fillStyle = Math.random() > 0.5 ? '#ff00ff' : '#00ffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'black';
+                ctx.font = 'bold 40px "Bungee", cursive';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('NO CAM', canvas.width/2, canvas.height/2);
+                
+                // Add retro noise
+                const imgData = ctx.getImageData(0,0, canvas.width, canvas.height);
+                for(let i=0; i<imgData.data.length; i+=4) {
+                    if(Math.random() > 0.6) {
+                        const color = Math.random() * 255;
+                        imgData.data[i] = color;
+                        imgData.data[i+1] = color;
+                        imgData.data[i+2] = color;
+                        imgData.data[i+3] = 255;
+                    }
+                }
+                ctx.putImageData(imgData, 0, 0);
+            }, 100);
+
+            let tracks = [];
+            try {
+                const canvasStream = canvas.captureStream(15);
+                if (canvasStream && canvasStream.getVideoTracks().length > 0) {
+                    tracks.push(canvasStream.getVideoTracks()[0]);
+                }
+            } catch (e) {
+                console.log("Canvas captureStream failed or is unsupported here.", e);
+            }
+
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const dst = audioCtx.createMediaStreamDestination();
+                if (dst.stream && dst.stream.getAudioTracks().length > 0) {
+                    tracks.push(dst.stream.getAudioTracks()[0]);
+                }
+            } catch(e) {
+                console.log("AudioContext fallback failed or is unsupported here.", e);
+            }
+            
+            return tracks.length > 0 ? new MediaStream(tracks) : null;
+        }
+
+        function findStranger() {
+            isSearching = true;
+            nextBtn.classList.remove('hidden');
+            stopBtn.classList.remove('hidden');
+            reportBtn.classList.remove('hidden');
+            startBtn.classList.add('hidden');
+            
+            // Reset UI for searching state
+            remoteVideo.classList.add('hidden');
+            waitingOverlay.classList.remove('hidden');
+            waitingText.innerText = "Finding a stranger...";
+            connectingLocation.innerText = "";
+            updateStatus(false, "Searching...");
+
+            searchTimeout = setTimeout(() => {
+                if(!isSearching) return;
+
+                waitingText.innerText = "Connecting...";
+                const randomCountry = COUNTRIES[Math.floor(Math.random() * COUNTRIES.length)];
+                connectingLocation.innerText = `Routing to peer in: ${randomCountry}`;
+                
+                searchTimeout = setTimeout(() => {
+                    if(!isSearching) return;
+                    connectToVideo();
+                }, 1500 + Math.random() * 2000);
+            }, 1000);
+        }
+
+        function connectToVideo() {
+            const randomVideo = FAKE_VIDEOS[Math.floor(Math.random() * FAKE_VIDEOS.length)];
+            
+            remoteVideo.src = randomVideo;
+            remoteVideo.load();
+            
+            remoteVideo.play().then(() => {
+                isSearching = false;
+                waitingOverlay.classList.add('hidden');
+                remoteVideo.classList.remove('hidden');
+                updateStatus(true, "Connected");
+                showToast("Stranger connected!", "bg-[var(--neon-green)]");
+            }).catch(err => {
+                console.log("Playback failed (possibly autoplay policy)", err);
+                remoteVideo.muted = true;
+                remoteVideo.play().then(() => {
+                    isSearching = false;
+                    waitingOverlay.classList.add('hidden');
+                    remoteVideo.classList.remove('hidden');
+                    updateStatus(true, "Connected (Muted by browser)");
+                }).catch(e => {
+                    findStranger();
+                });
+            });
+        }
+
+        remoteVideo.addEventListener('ended', () => {
+            showToast("Stranger disconnected. Finding next...", "bg-yellow-400");
+            findStranger();
+        });
+
+        startBtn.addEventListener('click', () => {
+            findStranger();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if(isSearching) return;
+            remoteVideo.pause();
+            remoteVideo.src = "";
+            findStranger();
+        });
+
+        stopBtn.addEventListener('click', () => {
+            clearTimeout(searchTimeout);
+            isSearching = false;
+            remoteVideo.pause();
+            remoteVideo.src = "";
+            remoteVideo.classList.add('hidden');
+            waitingOverlay.classList.remove('hidden');
+            waitingText.innerText = "Paused";
+            connectingLocation.innerText = "Click 'Start' to find someone new";
+            updateStatus(false, "Idle");
+            
+            nextBtn.classList.add('hidden');
+            stopBtn.classList.add('hidden');
+            reportBtn.classList.add('hidden');
+            startBtn.classList.remove('hidden');
+        });
+
+        const modalOverlay = document.getElementById('modal-overlay');
+        const customReasonRadio = document.getElementById('custom-reason-radio');
+        const customReasonInput = document.getElementById('custom-reason-input');
+        const cancelReportBtn = document.getElementById('cancel-report-btn');
+        const submitReportBtn = document.getElementById('submit-report-btn');
+        const reportRadios = document.querySelectorAll('input[name="report-reason"]');
+
+        reportRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if(e.target.value === 'Custom') {
+                    customReasonInput.classList.remove('hidden');
+                    customReasonInput.focus();
+                } else {
+                    customReasonInput.classList.add('hidden');
+                }
+            });
+        });
+
+        reportBtn.addEventListener('click', () => {
+            if(!isSearching && remoteVideo.src) {
+                modalOverlay.style.display = 'flex';
+                remoteVideo.pause(); // pause video while reporting
+            } else {
+                showToast("No active stranger to report.", "bg-yellow-400");
+            }
+        });
+
+        cancelReportBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'none';
+            if(!isSearching && remoteVideo.src) {
+                remoteVideo.play();
+            }
+        });
+
+        submitReportBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'none';
+            
+            let reason = document.querySelector('input[name="report-reason"]:checked').value;
+            if(reason === 'Custom') {
+                reason = customReasonInput.value || 'Unspecified';
+            }
+
+            console.log("Report submitted:", reason);
+            showToast("Stranger reported & blocked! Finding next...", "bg-[var(--neon-pink)]", "text-white");
+            
+            remoteVideo.src = "";
+            findStranger();
+        });
+
+        function goHome() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            window.location.href = 'landing.html';
+        }
+
+        toggleVideoBtn.addEventListener('click', () => {
+            if (localStream && localStream.getVideoTracks().length > 0) {
+                isVideoMuted = !isVideoMuted;
+                localStream.getVideoTracks()[0].enabled = !isVideoMuted;
+                
+                if (isVideoMuted) {
+                    videoIcon.classList.remove('ph-video-camera');
+                    videoIcon.classList.add('ph-video-camera-slash', 'text-red-500');
+                } else {
+                    videoIcon.classList.remove('ph-video-camera-slash', 'text-red-500');
+                    videoIcon.classList.add('ph-video-camera');
+                }
+            } else {
+                showToast("No camera track available to toggle.", "bg-red-400");
+            }
+        });
+
+        toggleAudioBtn.addEventListener('click', () => {
+            if (localStream && localStream.getAudioTracks().length > 0) {
+                isAudioMuted = !isAudioMuted;
+                localStream.getAudioTracks()[0].enabled = !isAudioMuted;
+                
+                if (isAudioMuted) {
+                    audioIcon.classList.remove('ph-microphone');
+                    audioIcon.classList.add('ph-microphone-slash', 'text-red-500');
+                } else {
+                    audioIcon.classList.remove('ph-microphone-slash', 'text-red-500');
+                    audioIcon.classList.add('ph-microphone');
+                }
+            } else {
+                showToast("No audio track available to toggle.", "bg-red-400");
+            }
+        });
+
+        function updateStatus(isConnected, text) {
+            statusText.innerText = text;
+            if (isConnected) {
+                statusDot.classList.add('online');
+            } else {
+                statusDot.classList.remove('online');
+            }
+        }
+
+        function showToast(msg, bgColor = "bg-[var(--neon-cyan)]", textColor = "text-black") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            
+            toast.className = `neo-box px-6 py-3 font-bold text-lg flex items-center gap-2 fixed bottom-5 left-1/2 -translate-x-1/2 translate-y-32 opacity-0 transition-all duration-300 z-[1000] ${bgColor} ${textColor}`;
+            toastMsg.innerText = msg;
+            
+            setTimeout(() => toast.classList.remove('translate-y-32', 'opacity-0'), 10);
+            setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 3000);
+        }
+
+        // Start everything when the page loads
+        window.addEventListener('load', () => {
+            if (savedUser) {
+                initCamera();
+            }
+        });
+    </script>
+</body>
+</html>

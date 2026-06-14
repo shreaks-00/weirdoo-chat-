@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiredVibe - Landing Page</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Bungee for funky headers, Space Mono for text -->
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons for UI buttons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-cyan: #00ffff;
+            --neon-yellow: #fffb00;
+            --neon-green: #39ff14;
+            --bg-purple: #3a0ca3;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: var(--bg-purple);
+            background-image: radial-gradient(var(--neon-cyan) 2px, transparent 2px), radial-gradient(var(--neon-pink) 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            animation: moveBackground 10s linear infinite;
+            color: #000;
+            overflow-x: hidden;
+        }
+
+        @keyframes moveBackground {
+            0% { background-position: 0 0, 20px 20px; }
+            100% { background-position: 40px 40px, 60px 60px; }
+        }
+
+        h1, h2, h3, .funky-font {
+            font-family: 'Bungee', cursive;
+        }
+
+        /* Neo-brutalism styling */
+        .neo-box {
+            background-color: white;
+            border: 4px solid black;
+            box-shadow: 8px 8px 0px black;
+            border-radius: 16px;
+        }
+
+        .neo-btn {
+            border: 4px solid black;
+            box-shadow: 6px 6px 0px black;
+            border-radius: 12px;
+            transition: all 0.1s ease-in-out;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .neo-btn:active {
+            box-shadow: 0px 0px 0px black;
+            transform: translate(6px, 6px);
+        }
+
+        /* Marquee animation */
+        .marquee {
+            white-space: nowrap;
+            overflow: hidden;
+            box-sizing: border-box;
+            background-color: var(--neon-yellow);
+            border-top: 4px solid black;
+            border-bottom: 4px solid black;
+            padding: 5px 0;
+            margin-bottom: 20px;
+        }
+
+        .marquee span {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+            font-family: 'Bungee', cursive;
+            font-size: 1.2rem;
+            color: black;
+            text-shadow: 2px 2px 0px white;
+            white-space: nowrap;
+        }
+
+        @keyframes marquee {
+            0%   { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .marquee-pink {
+            background-color: var(--neon-pink);
+        }
+
+        .marquee-reverse span {
+            animation: marquee-reverse 25s linear infinite;
+            color: white;
+            text-shadow: 2px 2px 0px black;
+        }
+
+        @keyframes marquee-reverse {
+            0%   { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+
+        .flicker-text {
+            animation: flicker 1.5s infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-8 px-4">
+
+    <!-- Header Marquee -->
+    <div class="w-full absolute top-0 left-0 marquee z-10">
+        <span>⚡ WHAT'S UP! Welcome to the GROOVIEST VIDEO CHAT on the web! ⚡ 100% ANONYMOUS - We don't track your data! ⚡ Your Privacy is strictly protected! ⚡ NO BORING INTERFACES ALLOWED! ⚡</span>
+    </div>
+
+    <!-- VIEW 1: LANDING PAGE -->
+    <div id="landing-page" class="max-w-4xl w-full mt-24 flex flex-col items-center gap-8 z-10 text-center transition-opacity duration-500">
+        
+        <header class="relative mb-8">
+            <h1 class="text-6xl md:text-8xl text-white drop-shadow-[6px_6px_0_rgba(0,0,0,1)] tracking-wide relative inline-block">
+                <span class="text-[var(--neon-pink)]">Wired</span><span class="text-[var(--neon-cyan)]">Vibe</span>
+                <i class="ph-fill ph-lightning absolute -top-6 -right-10 text-yellow-400 rotate-12 drop-shadow-[3px_3px_0_rgba(0,0,0,1)] text-7xl animate-pulse"></i>
+            </h1>
+            <br/>
+            <p class="mt-6 text-xl md:text-2xl font-bold bg-white border-4 border-black inline-block px-6 py-2 shadow-[4px_4px_0_#000] rotate-[-2deg]">
+                Connect with strangers instantly!
+            </p>
+        </header>
+        
+        <div class="neo-box p-8 bg-[var(--neon-yellow)] max-w-md w-full flex flex-col gap-6 transform rotate-1">
+            <div class="text-2xl font-bold border-b-4 border-black pb-4">
+                <span class="flicker-text text-[var(--neon-pink)]">⚡</span> <span id="online-count">8,492</span> users online
+            </div>
+            
+            <a href="profile.html" class="neo-btn bg-[var(--neon-pink)] text-white px-6 py-4 text-2xl hover:bg-pink-600 flex items-center justify-center gap-3">
+                <i class="ph-fill ph-video-camera"></i> ENTER THE CHAT
+            </a>
+            
+            <p class="text-sm font-bold text-gray-800">By clicking enter, you agree to enable your camera and be respectful to others.</p>
+        </div>
+
+        <div class="w-full mt-24 max-w-5xl flex flex-col gap-16">
+            
+            <!-- Privacy Marquee -->
+            <div class="w-[110vw] relative left-1/2 -translate-x-1/2 marquee marquee-pink marquee-reverse shadow-[8px_8px_0_#000] transform -rotate-2 border-y-8 border-black z-20">
+                <span>🔒 100% END-TO-END SECURE 🔒 NO TRACKERS OR SPYWARE 🔒 WE DON'T SELL YOUR DATA 🔒 STRICT PRIVACY POLICY 🔒 FULLY ANONYMOUS CHAT 🔒 REPORT BAD BEHAVIOR 🔒 SAFE AND FUN ENVIRONMENT 🔒</span>
+            </div>
+            
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="neo-box p-6 bg-[var(--neon-cyan)] transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+                    <i class="ph-fill ph-rocket text-5xl mb-4"></i>
+                    <h3 class="text-2xl funky-font mb-2">Instant Connect</h3>
+                    <p class="font-bold text-sm">No sign-ups, no waiting rooms. Click a button and boom, you're instantly face-to-face with a stranger.</p>
+                </div>
+                <div class="neo-box p-6 bg-white transform rotate-2 hover:rotate-0 transition-transform duration-300">
+                    <i class="ph-fill ph-detective text-5xl mb-4 text-[var(--neon-pink)]"></i>
+                    <h3 class="text-2xl funky-font mb-2">100% Anonymous</h3>
+                    <p class="font-bold text-sm">We don't track your data. Your identity remains a complete secret unless you decide to share it.</p>
+                </div>
+                <div class="neo-box p-6 bg-[var(--neon-green)] transform -rotate-1 hover:rotate-0 transition-transform duration-300">
+                    <i class="ph-fill ph-currency-circle-dollar text-5xl mb-4"></i>
+                    <h3 class="text-2xl funky-font mb-2">Totally Free</h3>
+                    <p class="font-bold text-sm">Keep your wallet in your pocket. Meeting awesome people shouldn't cost you a single dime.</p>
+                </div>
+            </div>
+
+            <!-- About Text -->
+            <div class="neo-box p-8 md:p-12 bg-[var(--bg-purple)] text-white border-4 border-white shadow-[8px_8px_0_#fff] text-left relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 opacity-20 transform rotate-12 pointer-events-none">
+                    <i class="ph-fill ph-alien text-[15rem]"></i>
+                </div>
+                <h2 class="text-4xl md:text-5xl funky-font mb-6 text-[var(--neon-yellow)] relative z-10">What the heck is WiredVibe?</h2>
+                <div class="relative z-10 flex flex-col gap-4 text-lg font-bold">
+                    <p>We got incredibly sick of boring, corporate-looking video chat apps that feel like you're entering a 9-to-5 board meeting. WiredVibe is your neon-soaked, retro-futuristic portal to the global community.</p>
+                    <p>Whether you're looking to make a new friend across the world, practice a new language, or just show off your funky dance moves, this is the place to be. No strict rules (except be respectful), no limits, just pure unadulterated vibes.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="text-left w-full flex flex-col gap-6">
+                <h2 class="text-5xl funky-font text-white drop-shadow-[4px_4px_0_#000] mb-4 text-center">F.A.Q.</h2>
+                
+                <div class="neo-box p-6 bg-white hover:bg-gray-50 transition-colors">
+                    <h4 class="text-xl funky-font text-[var(--neon-pink)] mb-2">Q: Do I need an account to use this?</h4>
+                    <p class="font-bold text-gray-800">A: Nope! We hate passwords as much as you do. Just click "Enter The Chat" at the top of the page and you're good to go.</p>
+                </div>
+                
+                <div class="neo-box p-6 bg-white hover:bg-gray-50 transition-colors">
+                    <h4 class="text-xl funky-font text-[var(--neon-pink)] mb-2">Q: What if I don't have a webcam?</h4>
+                    <p class="font-bold text-gray-800">A: We've got your back! If you don't have a camera or deny permission, our highly advanced "Funky Fake-Cam™" system kicks in so you can still join the fun and watch others.</p>
+                </div>
+
+                <div class="neo-box p-6 bg-white hover:bg-gray-50 transition-colors">
+                    <h4 class="text-xl funky-font text-[var(--neon-pink)] mb-2">Q: Are the people here real?</h4>
+                    <p class="font-bold text-gray-800">A: You'll be connecting to a vast network of highly interesting individuals from all over the world. Enjoy the magic and unpredictability of the internet!</p>
+                </div>
+            </div>
+            
+            <!-- How It Works & Rules Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-4">
+                <div class="neo-box p-8 bg-[var(--neon-pink)] text-white transform rotate-1">
+                    <h3 class="text-3xl funky-font mb-4 text-black drop-shadow-[2px_2px_0_#fff]">How To Use WiredVibe</h3>
+                    <ol class="list-decimal pl-6 font-bold space-y-3">
+                        <li><strong>Step 1:</strong> Enter a funky nickname (or stay completely anonymous) and select your gender.</li>
+                        <li><strong>Step 2:</strong> Click "Enter The Chat" to bypass all the boring sign-up screens.</li>
+                        <li><strong>Step 3:</strong> Allow camera access so the other person can see you (or use our Funky Fake-Cam).</li>
+                        <li><strong>Step 4:</strong> Click "Start" and instantly get matched with a random stranger! Not vibing? Just hit "Skip".</li>
+                    </ol>
+                </div>
+
+                <div class="neo-box p-8 bg-[var(--neon-cyan)] text-black transform -rotate-1">
+                    <h3 class="text-3xl funky-font mb-4 text-white drop-shadow-[2px_2px_0_#000]">Community Rules</h3>
+                    <ul class="list-disc pl-6 font-bold space-y-3">
+                        <li><strong>Be Respectful:</strong> Harassment, hate speech, or bullying will get you instantly banned from the network.</li>
+                        <li><strong>Keep It Clean:</strong> Nobody wants to see that. Nudity and explicit content are strictly prohibited on the main feed.</li>
+                        <li><strong>Protect Your Privacy:</strong> Never share personal information, passwords, or banking details with strangers.</li>
+                        <li><strong>Report Bad Behavior:</strong> Use the Report button to instantly skip and flag anyone breaking the rules. We review reports aggressively.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SEO Keyword Block -->
+            <div class="neo-box p-6 bg-white transform rotate-1 transition-transform duration-300 mt-8 mb-4">
+                <h3 class="text-xl funky-font mb-2 text-[var(--neon-pink)]">The Best Alternative for Free Random Video Chat</h3>
+                <p class="font-bold text-sm text-gray-700 leading-relaxed">
+                    Looking for the ultimate Omegle alternative? WiredVibe is the premier destination for <strong>free random video chat</strong> and meeting strangers online. Unlike other platforms, we offer a completely <strong>free gender filter</strong> so you can easily connect and <strong>chat with girls</strong> or boys from around the world without paying premium fees. Looking for an <strong>only 18 plus chat</strong>? We've built an unfiltered, raw space for adults to vibe. Whether you want a wild <strong>18+ video call</strong>, a <strong>lusty stranger chat</strong>, to find <strong>hot girls online free</strong>, or to dive into a <strong>flirty dirty chat</strong>, our fast 1-on-1 cam system has you covered. Sick of the <strong>creepy guys</strong>, <strong>horny creeps on cam</strong>, and <strong>lusty weirdos</strong> ruining your mood? Say goodbye to the boring and hello to the funky. Connect instantly, use the <strong>free gender filter</strong>, and easily banish the <strong>creepy ones</strong> by using our instant skip and report features. Experience a true <strong>18+ random chat</strong> without the hassle. Join the best <strong>stranger chat app</strong> today!
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <footer class="mt-12 mb-8 text-white font-bold tracking-widest text-sm text-center border-t-4 border-black/20 pt-8">
+                <p class="drop-shadow-[2px_2px_0_#000]">© 2026 WIREDVIBE. KEEP IT FUNKY. <br/> MADE WITH ⚡ FOR THE WEB.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Fake Online Counter Logic
+        setInterval(() => {
+            const el = document.getElementById('online-count');
+            if (el) {
+                let count = parseInt(el.innerText.replace(/,/g, ''));
+                count += Math.floor(Math.random() * 5) - 2; // fluctuate -2 to +2
+                el.innerText = count.toLocaleString();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
