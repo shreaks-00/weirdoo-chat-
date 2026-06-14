@@ -252,7 +252,33 @@
         </div>
     </div>
 
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" class="fixed bottom-0 left-0 w-full bg-white border-t-4 border-black p-4 z-[3000] transform translate-y-full transition-transform duration-500 shadow-[0_-8px_0_#ff00ff]">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="font-bold text-sm text-center sm:text-left">
+                🍪 <strong>Cookie Policy:</strong> We use cookies to enhance your experience, save your funky profile, and keep things secure. By continuing to use WiredVibe, you agree to our use of cookies.
+            </p>
+            <button id="accept-cookies-btn" class="neo-btn bg-[var(--neon-green)] text-black px-6 py-2 hover:bg-green-400 whitespace-nowrap">Got It!</button>
+        </div>
+    </div>
+
     <script>
+        // Cookie Banner Logic
+        window.addEventListener('DOMContentLoaded', () => {
+            const cookieBanner = document.getElementById('cookie-banner');
+            const acceptBtn = document.getElementById('accept-cookies-btn');
+            
+            if (!localStorage.getItem('wiredvibe_cookies_accepted')) {
+                setTimeout(() => {
+                    cookieBanner.classList.remove('translate-y-full');
+                }, 1000);
+            }
+            
+            acceptBtn.addEventListener('click', () => {
+                localStorage.setItem('wiredvibe_cookies_accepted', 'true');
+                cookieBanner.classList.add('translate-y-full');
+            });
+        });
         // Fake Online Counter Logic
         setInterval(() => {
             const el = document.getElementById('online-count');
